@@ -39,7 +39,7 @@ app.add_middleware(
     "http://localhost:5173",
     "https://revive-ai-frontend-57kg.onrender.com",
     "https://revive-ai-1-frontend.onrender.com",
-]
+],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
