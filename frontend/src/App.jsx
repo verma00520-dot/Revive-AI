@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
-const API = "http://127.0.0.1:8000";
+const API = "https://revive-ai-1-aqsu.onrender.com";
 
 function App() {
   const [metrics, setMetrics] = useState({});
@@ -612,11 +612,11 @@ function App() {
                                 <div
                                   style={{
                                     width: `${(count /
-                                        Math.max(
-                                          ...Object.values(
-                                            actionDistribution
-                                          )
-                                        )) *
+                                      Math.max(
+                                        ...Object.values(
+                                          actionDistribution
+                                        )
+                                      )) *
                                       100
                                       }%`,
                                   }}
