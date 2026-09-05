@@ -1,3 +1,4 @@
+import traceback
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -110,6 +111,80 @@ def home():
 def create_payment_failure(
     payment: PaymentFailure
 ):
+
+    try:
+
+        payment_data = payment.model_dump()
+
+        # Store payment
+        insert_payment(payment_data)
+
+        # Run recovery AI
+        decision = recovery_agent(payment_data)
+
+        # Execute approved action
+        result = execute_action(
+            payment_data,
+            decision["final_action"],
+            decision["recovery_probability"]
+        )
+
+        recovered = (
+            result["status"] == "SUCCESS"
+        )
+
+        recovered_amount = result.get(
+            "recovered_amount",
+            0
+        )
+
+        # Save result
+        update_payment_result(
+            payment_id=payment.payment_id,
+            recovery_probability=decision["recovery_probability"],
+            recommended_action=decision["recommended_action"],
+            final_action=decision["final_action"],
+            guardrail_allowed=decision["guardrail_allowed"],
+            status=result["status"],
+            recovered=recovered,
+            recovered_amount=recovered_amount
+        )
+
+        # Save action history
+        insert_recovery_action(
+            payment_id=payment.payment_id,
+            action=decision["final_action"],
+            reason=decision["reason"],
+            recovery_probability=decision["recovery_probability"],
+            guardrail_allowed=decision["guardrail_allowed"],
+            result=result["status"],
+            recovered_amount=recovered_amount
+        )
+
+        return {
+            "payment_id": payment.payment_id,
+            "recovery_probability": decision["recovery_probability"],
+            "recommended_action": decision["recommended_action"],
+            "final_action": decision["final_action"],
+            "guardrail": (
+                "PASSED"
+                if decision["guardrail_allowed"]
+                else "BLOCKED"
+            ),
+            "result": result["status"],
+            "recovered_amount": recovered_amount
+        }
+
+    except Exception as e:
+
+        print("\n========== REVIVE AI ERROR ==========")
+        traceback.print_exc()
+        print("====================================\n")
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
     payment_data = payment.model_dump()
 
