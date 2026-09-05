@@ -9,8 +9,16 @@ from backend.guardrails import check_action
 # ============================================================
 
 MODEL_PATH = "models/recovery_model.pkl"
-
 model = joblib.load(MODEL_PATH)
+
+# Compatibility fix for the saved LogisticRegression model
+try:
+    if hasattr(model, "steps"):
+        model.steps[-1][1].multi_class = "auto"
+    elif hasattr(model, "multi_class") is False:
+        model.multi_class = "auto"
+except Exception:
+    pass
 
 
 # ============================================================
