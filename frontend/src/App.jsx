@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
-const API = "https://revive-ai-1-aqsu.onrender.com";
+const API = "https://revive-ai-backend-sjsi.onrender.com";
 
 function App() {
   const [metrics, setMetrics] = useState({});
